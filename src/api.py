@@ -44,6 +44,8 @@ import uvicorn
 
 from chatterbox.tts import ChatterboxTTS
 
+from text_splitter import split_text, stitch_audio_segments, DEFAULT_MAX_CHUNK_SIZE
+
 # Project paths
 PROJECT_DIR = Path(__file__).parent.parent
 VOICES_DIR = PROJECT_DIR / "voices"
@@ -57,6 +59,9 @@ PRESETS_DIR.mkdir(exist_ok=True)
 # Global model instance
 model = None
 device = None
+
+# Long text handling threshold
+LONG_TEXT_THRESHOLD = 900  # Start splitting before hitting the limit
 
 
 def get_device():
@@ -326,6 +331,55 @@ def get_available_presets():
     return presets
 
 
+def generate_speech_long_text(
+    text: str,
+    voice_path: str = None,
+    chunk_size: int = DEFAULT_MAX_CHUNK_SIZE,
+    silence_duration: float = 0.5
+):
+    """
+    Generate speech for long text by splitting into chunks and stitching.
+    
+    Args:
+        text: Long text to convert
+        voice_path: Optional path to voice sample
+        chunk_size: Maximum characters per chunk
+        silence_duration: Seconds of silence between chunks
+        
+    Returns:
+        Combined audio tensor
+    """
+    global model
+    
+    print(f"📝 Long text detected ({len(text)} chars), splitting into chunks...", file=sys.stderr)
+    
+    # Split text
+    chunks = split_text(text, max_chunk_size=chunk_size)
+    print(f"✂️  Split into {len(chunks)} chunks", file=sys.stderr)
+    
+    # Generate audio for each chunk
+    segments = []
+    for i, chunk in enumerate(chunks, 1):
+        print(f"🎤 Processing chunk {i}/{len(chunks)} ({len(chunk)} chars)...", file=sys.stderr)
+        
+        if voice_path:
+            wav = model.generate(chunk, audio_prompt_path=str(voice_path))
+        else:
+            wav = model.generate(chunk)
+        
+        segments.append(wav)
+    
+    # Stitch together with silence
+    print(f"🔗 Stitching {len(segments)} segments with {silence_duration}s silence...", file=sys.stderr)
+    combined = stitch_audio_segments(segments, model.sr, silence_duration)
+    
+    total_chars = sum(len(c) for c in chunks)
+    duration = len(combined[0]) / model.sr
+    print(f"✅ Generated {duration:.2f}s of audio from {total_chars} characters", file=sys.stderr)
+    
+    return combined
+
+
 # ============== API ENDPOINTS ==============
 
 @app.get("/")
@@ -376,7 +430,7 @@ async def list_voices():
 async def sayas(request: SayAsRequest):
     """
     Generate speech from text with OVERKILL options.
-    
+
     - **voice**: Name of the voice to use
     - **text**: Text to convert to speech
     - **output_mode**: "play", "return", "both", or "save"
@@ -384,12 +438,14 @@ async def sayas(request: SayAsRequest):
     - **effects**: Reverb, echo, chorus, distortion
     - **output_format**: wav, mp3, flac, ogg
     - **background_music**: Path to background music file
+    
+    Long text (900+ chars) with custom voice is automatically split and stitched.
     """
     global model
-    
+
     if model is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
-    
+
     # Find voice file if exists
     voice_path = None
     if request.use_custom_voice:
@@ -398,31 +454,43 @@ async def sayas(request: SayAsRequest):
             if vp.exists():
                 voice_path = vp
                 break
-    
+
+    # Check if we need long text handling
+    needs_split = (
+        len(request.text) > LONG_TEXT_THRESHOLD and
+        voice_path is not None
+    )
+
     # Generate speech
     try:
-        if voice_path and request.use_custom_voice:
-            wav = model.generate(request.text, audio_prompt_path=str(voice_path))
+        if needs_split:
+            wav = generate_speech_long_text(
+                request.text,
+                str(voice_path) if voice_path else None
+            )
         else:
-            wav = model.generate(request.text)
-        
+            if voice_path and request.use_custom_voice:
+                wav = model.generate(request.text, audio_prompt_path=str(voice_path))
+            else:
+                wav = model.generate(request.text)
+
         # Apply morphing
         if request.morphing:
             wav = apply_morphing(wav, request.morphing)
-        
+
         # Apply effects
         if request.effects:
             wav = apply_effects(wav, request.effects)
-        
+
         # Mix background music
         if request.background_music and Path(request.background_music).exists():
             wav = mix_background(wav, request.background_music, request.background_volume)
-        
+
         # Play on server if requested
         if request.output_mode in ["play", "both"]:
             print(f"🔊 Playing audio...", file=sys.stderr)
             play_audio(wav, model.sr)
-        
+
         # Save or return
         if request.output_mode == "save" or request.save_path:
             output_path = request.save_path or OUTPUT_DIR / f"sayas_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{request.output_format}"
@@ -432,16 +500,17 @@ async def sayas(request: SayAsRequest):
                 "voice": request.voice,
                 "text": request.text,
                 "saved_path": str(output_path),
-                "url": f"/output/{Path(output_path).name}"
+                "url": f"/output/{Path(output_path).name}",
+                "long_text_processed": needs_split
             }
-        
+
         if request.output_mode in ["return", "both"]:
             # Convert to bytes
             audio_buffer = io.BytesIO()
             torchaudio.save(audio_buffer, wav, model.sr, format=request.output_format.upper())
             audio_buffer.seek(0)
             audio_base64 = base64.b64encode(audio_buffer.read()).decode()
-            
+
             return {
                 "success": True,
                 "voice": request.voice,
@@ -450,16 +519,18 @@ async def sayas(request: SayAsRequest):
                 "duration_seconds": len(wav[0]) / model.sr,
                 "format": request.output_format,
                 "audio_base64": audio_base64,
-                "audio_url": f"data:audio/{request.output_format};base64," + audio_base64
+                "audio_url": f"data:audio/{request.output_format};base64," + audio_base64,
+                "long_text_processed": needs_split
             }
-        
+
         return {
             "success": True,
             "voice": request.voice,
             "text": request.text,
-            "played": True
+            "played": True,
+            "long_text_processed": needs_split
         }
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

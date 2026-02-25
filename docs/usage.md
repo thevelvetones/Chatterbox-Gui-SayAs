@@ -103,6 +103,31 @@ SayAs <speaker> "<text>" [-output <filepath>]
 | `<speaker>` | Speaker name or path to voice sample file |
 | `<text>` | Text to convert to speech (wrap in quotes) |
 | `-output, -o` | Optional: Output file path to save audio |
+| `-chunk-size` | Max characters per chunk for long text (default: 800) |
+| `-silence` | Seconds of silence between chunks (default: 0.5) |
+| `-no-split` | Disable automatic long text splitting |
+
+### Long Text Support
+
+When using custom voice samples with text over 900 characters, SayAs automatically:
+1. Splits text into chunks at sentence boundaries
+2. Processes each chunk separately
+3. Stitches audio together with silence gaps
+
+**Example with long text:**
+```bash
+# Automatic splitting for long text
+SayAs Kate "This is a very long text that exceeds the limit..."
+
+# Customize chunk size
+SayAs Kate "Long text..." -chunk-size 600
+
+# Customize silence between chunks
+SayAs Kate "Long text..." -silence 1.0
+
+# Disable auto-splitting (may cause errors with long text)
+SayAs Kate "Long text..." -no-split
+```
 
 ### Examples
 
@@ -178,6 +203,29 @@ curl -X POST http://localhost:8765/sayas \
       "normalize": true
     }
   }'
+```
+
+### Long Text Handling (API)
+
+The API automatically handles long text (900+ characters) when using custom voices:
+
+```json
+{
+  "voice": "Kate",
+  "text": "This is a very long text that will be automatically split...",
+  "output_mode": "return"
+}
+```
+
+Response includes `long_text_processed: true` if splitting was applied:
+
+```json
+{
+  "success": true,
+  "long_text_processed": true,
+  "duration_seconds": 45.2,
+  ...
+}
 ```
 
 ---

@@ -3,7 +3,27 @@
 ## Project Overview
 CLI + API + WebUI text-to-speech using Chatterbox with custom voices, voice morphing, audio effects, and more.
 
-**Status**: COMPLETE ✅
+**Status**: IN PROGRESS 🚧 - Long Text Support
+
+---
+
+## In Progress
+
+### Long Text Support 🔧
+
+Chatterbox TTS has a ~1000 character/token limit when using voice cloning (custom voice samples). When text exceeds this limit, it errors out.
+
+**Solution**: Split long text into sentences, process each chunk, then stitch audio together with configurable silence gaps.
+
+**Tasks**:
+- [ ] Research exact Chatterbox TTS character/token limits
+- [ ] Add text splitting utility (sentence-aware)
+- [ ] Implement audio stitching with 0.5s silence between segments
+- [ ] Update CLI to auto-split long text
+- [ ] Update API /sayas endpoint for automatic handling
+- [ ] Add config for silence duration
+- [ ] Test with 10000+ character texts
+- [ ] Document in usage.md
 
 ---
 
