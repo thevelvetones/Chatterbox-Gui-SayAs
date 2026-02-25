@@ -38,6 +38,9 @@ output/*.mp3
 output/*.flac
 output/*.ogg
 
+# Temporary files
+temp_output.wav
+
 # OS
 .DS_Store
 Thumbs.db
