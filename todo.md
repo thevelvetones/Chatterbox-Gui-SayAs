@@ -1,9 +1,9 @@
 # SayAs - LUDICUS OVERKILL Edition 💕🎮
 
 ## Project Overview
-CLI + API + WebUI text-to-speech using Chatterbox with custom voices, voice morphing, audio effects, and more.
+CLI + API + WebUI + **Desktop App** text-to-speech using Chatterbox with custom voices, voice morphing, audio effects, and more.
 
-**Current Status**: Building Electron Desktop App! 🚀
+**Current Status**: Electron Desktop App Created! 🚀
 
 ---
 
@@ -16,22 +16,30 @@ CLI + API + WebUI text-to-speech using Chatterbox with custom voices, voice morp
 - ✅ API auto-split with response flag
 - ✅ Abbreviation handling (Mr., Dr., St., etc.)
 
+### WebUI Voice Upload
+- ✅ Name input field for new voices
+- ✅ File upload for .wav/.mp3 audio files
+- ✅ Save button to store voices
+- ✅ Voice list display
+- ✅ Delete functionality
+
+### Electron Desktop App
+- ✅ Main process (window + Python backend management)
+- ✅ Preload script (secure IPC)
+- ✅ Renderer (loading screen with pink theme)
+- ✅ electron-builder configuration
+- ✅ Build scripts for Windows
+- ✅ App icon (SVG)
+
 ---
 
 ## In Progress 🚧
 
-### Electron Desktop App
-Wrapping SayAs in a standalone Windows executable!
-
-**Tasks**:
-- [x] Add voice upload feature to WebUI
-- [ ] Project folder restructuring
-- [ ] Create Electron main process
-- [ ] Create Electron preload script
-- [ ] Build WebUI for Electron
-- [ ] Configure electron-builder
-- [ ] Build Windows .exe installer
-- [ ] Test standalone functionality
+### Final Steps
+- [ ] Install npm dependencies
+- [ ] Build Windows installer
+- [ ] Test standalone .exe
+- [ ] Update all documentation
 
 ---
 
@@ -55,6 +63,13 @@ SayAs Kate "Long text..."           # Auto-splits if 900+ chars!
 ```bash
 .\start-webui.bat
 # Open: http://localhost:7860
+```
+
+### Electron App (NEW!)
+```bash
+cd electron-app
+.\start.bat          # Development
+.\build.bat          # Build installer
 ```
 
 ### Dashboard
@@ -86,7 +101,7 @@ Open `dashboard.html` in browser for full control center.
 - ✅ Gradio WebUI (pink notebook theme)
 - ✅ Interactive HTML Dashboard
 - ✅ API with Swagger docs
-- 🚧 Electron Desktop App (in progress)
+- ✅ **Electron Desktop App** (Windows .exe)
 
 ---
 
@@ -102,15 +117,29 @@ SayAs/
 ├── src/
 │   ├── sayas.py        # CLI app
 │   ├── api.py          # FastAPI server
-│   ├── webui.py        # Gradio UI
+│   ├── webui.py        # Gradio UI (with voice upload!)
 │   └── text_splitter.py # Long text handling
 ├── voices/             # Custom voice samples
 ├── output/             # Generated audio
 ├── presets/            # Voice presets
 ├── venv/               # Python virtual environment
 ├── docs/               # Documentation
+│   ├── usage.md
+│   ├── api-reference.md
+│   ├── webui-guide.md
+│   ├── project-memory.md
+│   └── index.html      # Pink notebook docs site
+├── electron-app/       # NEW! Desktop app
+│   ├── src/
+│   │   ├── main/
+│   │   ├── preload/
+│   │   └── renderer/
+│   ├── assets/
+│   ├── package.json
+│   ├── build.bat
+│   └── start.bat
 ├── README.md
-└── todo.md             # This file!
+└── todo.md
 ```
 
 ---
@@ -127,6 +156,7 @@ SayAs/
 ## Git History
 
 ```
+6ceb3a5 Added WebUI voice upload feature 💕
 221e5f5 Add temp_output.wav to .gitignore 💕
 849d03e Add long text support with auto-splitting 💕
 578b349 Complete documentation with pink notebook theme
@@ -148,6 +178,30 @@ c7f99f9 Initial commit: SayAs CLI v1.0
 - All docs in `/docs` as .md files
 - Long text (900+ chars) auto-splits with custom voices
 - 0.5s silence between chunks by default
+- **NEW**: WebUI has voice upload feature!
+- **NEW**: Electron desktop app available!
+
+---
+
+## Building the Electron App
+
+### 1. Install Dependencies
+```bash
+cd electron-app
+npm install
+```
+
+### 2. Run in Development
+```bash
+.\start.bat
+```
+
+### 3. Build Windows Installer
+```bash
+.\build.bat
+```
+
+Installer will be in `electron-app/dist/`
 
 ---
 

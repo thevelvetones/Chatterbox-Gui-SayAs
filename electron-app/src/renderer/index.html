@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' http://localhost:*; img-src 'self' data: blob:;">
+    <title>💕 SayAs TTS - Loading...</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Notebook paper effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 80px;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #e91e63 0%, #e91e63 100%);
+            opacity: 0.4;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 31px,
+                rgba(233, 30, 99, 0.08) 32px
+            );
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 1;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 30px;
+            border: 4px dashed #ec407a;
+            box-shadow: 0 10px 40px rgba(233, 30, 99, 0.3);
+            max-width: 600px;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4em;
+            color: #d81b60;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            margin: 30px auto;
+            border: 6px solid #fce4ec;
+            border-top-color: #ec407a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status {
+            font-size: 1.3em;
+            color: #880e4f;
+            margin: 20px 0;
+        }
+
+        .status.error {
+            color: #d32f2f;
+        }
+
+        .status.success {
+            color: #388e3c;
+        }
+
+        .heart {
+            font-size: 3em;
+            animation: heartbeat 1.5s infinite;
+            display: inline-block;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .info-box {
+            background: #fce4ec;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #f48fb1;
+        }
+
+        .info-box p {
+            color: #880e4f;
+            margin: 10px 0;
+        }
+
+        .iframe-container {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .iframe-container.active {
+            display: block;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            animation: sparkle 2s infinite;
+            font-size: 1.5em;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .retry-btn {
+            background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3em;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+            transition: all 0.3s;
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="container" id="loadingScreen">
+        <h1><span class="heart">💕</span> SayAs TTS <span class="heart">💕</span></h1>
+        <p style="color: #d81b60; font-size: 1.2em;">LUDICUS OVERKILL Edition</p>
+        
+        <div class="spinner"></div>
+        
+        <div class="status" id="status">Starting Python backend...</div>
+        
+        <div class="info-box">
+            <p>🎤 Loading Chatterbox TTS model...</p>
+            <p>✨ This may take a moment on first launch</p>
+            <p>💖 GPU acceleration enabled if available</p>
+        </div>
+    </div>
+
+    <!-- Error Screen -->
+    <div class="container" id="errorScreen" style="display: none;">
+        <h1>😢 Oops!</h1>
+        <div class="status error" id="errorMessage"></div>
+        <button class="retry-btn" onclick="location.reload()">🔄 Try Again</button>
+    </div>
+
+    <!-- Main App (iframe) -->
+    <div class="iframe-container" id="appContainer">
+        <iframe id="webuiFrame" src=""></iframe>
+    </div>
+
+    <script>
+        const WEBUI_PORT = 7860;
+        const WEBUI_URL = `http://localhost:${WEBUI_PORT}`;
+        const MAX_RETRIES = 30;
+        const RETRY_DELAY = 1000;
+
+        let retryCount = 0;
+
+        // Create sparkles
+        function createSparkles() {
+            for (let i = 0; i < 15; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.textContent = ['✨', '💖', '⭐', '💕'][Math.floor(Math.random() * 4)];
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(sparkle);
+            }
+        }
+
+        // Update status
+        function setStatus(message, type = '') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+
+        // Check if WebUI is ready
+        async function checkWebUI() {
+            try {
+                const response = await fetch(WEBUI_URL, { method: 'HEAD' });
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        // Wait for WebUI to be ready
+        async function waitForWebUI() {
+            while (retryCount < MAX_RETRIES) {
+                const ready = await checkWebUI();
+                
+                if (ready) {
+                    setStatus('WebUI ready! Loading...', 'success');
+                    return true;
+                }
+                
+                retryCount++;
+                setStatus(`Starting backend... (${retryCount}/${MAX_RETRIES})`);
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+            }
+            
+            return false;
+        }
+
+        // Initialize app
+        async function init() {
+            createSparkles();
+
+            // Check if running in Electron
+            const isElectron = window.sayasAPI !== undefined;
+            
+            if (isElectron) {
+                console.log('Running in Electron');
+                
+                // Get app info from Electron
+                const version = await window.sayasAPI.getVersion();
+                const isDev = await window.sayasAPI.isDev();
+                
+                console.log(`SayAs TTS v${version} ${isDev ? '(Dev)' : ''}`);
+                
+                // Listen for Python errors
+                window.sayasAPI.onPythonError((error) => {
+                    console.error('Python error:', error);
+                    setStatus('Python error: ' + error, 'error');
+                });
+                
+                window.sayasAPI.onPythonExit((code) => {
+                    console.error('Python exited with code:', code);
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('errorScreen').style.display = 'block';
+                    document.getElementById('errorMessage').textContent = 
+                        `Backend crashed (code: ${code}). Please restart the app.`;
+                });
+            } else {
+                console.log('Running in browser');
+            }
+
+            // Wait for WebUI
+            const ready = await waitForWebUI();
+            
+            if (ready) {
+                // Show the app
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+                document.getElementById('webuiFrame').src = WEBUI_URL;
+            } else {
+                // Show error
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('errorScreen').style.display = 'block';
+                document.getElementById('errorMessage').textContent = 
+                    'Failed to start the WebUI backend. Please check if Python and dependencies are installed.';
+            }
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>

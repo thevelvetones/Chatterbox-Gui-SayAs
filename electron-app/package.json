@@ -1,0 +1,94 @@
+{
+  "name": "sayas-tts",
+  "version": "4.0.0",
+  "description": "SayAs - LUDICUS OVERKILL Edition - Beautiful Text-to-Speech with Custom Voice Cloning",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [
+    "tts",
+    "text-to-speech",
+    "voice",
+    "chatterbox",
+    "ai",
+    "speech",
+    "audio"
+  ],
+  "author": {
+    "name": "Lief",
+    "email": "lief@sayas.local"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "electron-log": "^5.0.3",
+    "electron-store": "^8.1.0"
+  },
+  "build": {
+    "appId": "com.sayas.tts",
+    "productName": "SayAs TTS",
+    "icon": "assets/icon.ico",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "python/**/*",
+      "voices/**/*",
+      "presets/**/*",
+      "output/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "python",
+        "to": "python",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "voices",
+        "to": "voices",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "presets",
+        "to": "presets",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SayAs TTS",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "license": "LICENSE",
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "extraMetadata": {
+      "main": "src/main/main.js"
+    }
+  }
+}
