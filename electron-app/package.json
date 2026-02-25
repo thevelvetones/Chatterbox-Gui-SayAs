@@ -7,6 +7,7 @@
     "start": "electron .",
     "build": "electron-builder",
     "build:win": "electron-builder --win --x64",
+    "build:portable": "electron-builder --win portable --x64",
     "pack": "electron-builder --dir",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -35,20 +36,23 @@
   "build": {
     "appId": "com.sayas.tts",
     "productName": "SayAs TTS",
-    "icon": "assets/icon.ico",
+    "icon": "assets/icon.png",
+    "asar": false,
     "directories": {
       "output": "dist",
       "buildResources": "assets"
     },
-    "files": [
-      "src/**/*",
-      "assets/**/*",
-      "python/**/*",
-      "voices/**/*",
-      "presets/**/*",
-      "output/**/*"
-    ],
-    "extraResources": [
+    "extraFiles": [
+      {
+        "from": "src",
+        "to": "src",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "assets",
+        "to": "assets",
+        "filter": ["**/*"]
+      },
       {
         "from": "python",
         "to": "python",
@@ -63,32 +67,19 @@
         "from": "presets",
         "to": "presets",
         "filter": ["**/*"]
+      },
+      {
+        "from": "output",
+        "to": "output",
+        "filter": ["**/*"]
       }
     ],
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
-      ],
-      "icon": "assets/icon.ico",
-      "requestedExecutionLevel": "asInvoker"
+      "target": "portable",
+      "artifactName": "${productName}-${version}-Portable.${ext}"
     },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "SayAs TTS",
-      "installerIcon": "assets/icon.ico",
-      "uninstallerIcon": "assets/icon.ico",
-      "installerHeaderIcon": "assets/icon.ico",
-      "license": "LICENSE",
-      "artifactName": "${productName}-${version}-Setup.${ext}"
-    },
-    "extraMetadata": {
-      "main": "src/main/main.js"
+    "portable": {
+      "unpackDirName": "SayAs-TTS-Data"
     }
   }
 }

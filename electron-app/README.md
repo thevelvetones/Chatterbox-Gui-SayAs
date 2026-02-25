@@ -18,11 +18,36 @@ npm start
 
 ### Build Windows Installer
 
+**Note:** Requires Administrator privileges for symbolic link creation.
+
 ```bash
+# Run as Administrator
 npm run build:win
 ```
 
 The installer will be created in `dist/` folder.
+
+---
+
+## Build Troubleshooting
+
+### "A required privilege is not held by the client"
+
+This error occurs when building without Administrator privileges. Windows requires elevated permissions to create symbolic links during the build process.
+
+**Solution:** Run the build command as Administrator:
+
+1. Open Command Prompt or PowerShell as Administrator
+2. Navigate to the electron-app folder
+3. Run: `npm run build:win`
+
+### Alternative: Enable Developer Mode
+
+Windows 10/11 Developer Mode allows symlink creation without admin:
+
+1. Settings → Update & Security → For Developers
+2. Enable "Developer Mode"
+3. Try building again
 
 ---
 
