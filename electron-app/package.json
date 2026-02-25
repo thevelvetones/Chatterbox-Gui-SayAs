@@ -3,6 +3,10 @@
   "version": "4.0.0",
   "description": "SayAs - LUDICUS OVERKILL Edition - Beautiful Text-to-Speech with Custom Voice Cloning",
   "main": "src/main/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thevelvetones/Chatterbox-Gui-SayAs.git"
+  },
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
@@ -42,36 +46,28 @@
       "output": "dist",
       "buildResources": "assets"
     },
-    "extraFiles": [
-      {
-        "from": "src",
-        "to": "src",
-        "filter": ["**/*"]
-      },
-      {
-        "from": "assets",
-        "to": "assets",
-        "filter": ["**/*"]
-      },
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "extraResources": [
       {
         "from": "python",
         "to": "python",
-        "filter": ["**/*"]
+        "filter": ["**/*"],
+        "optional": true
       },
       {
         "from": "voices",
         "to": "voices",
-        "filter": ["**/*"]
+        "filter": ["**/*"],
+        "optional": true
       },
       {
         "from": "presets",
         "to": "presets",
-        "filter": ["**/*"]
-      },
-      {
-        "from": "output",
-        "to": "output",
-        "filter": ["**/*"]
+        "filter": ["**/*"],
+        "optional": true
       }
     ],
     "win": {
@@ -80,6 +76,12 @@
     },
     "portable": {
       "unpackDirName": "SayAs-TTS-Data"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "thevelvetones",
+      "repo": "Chatterbox-Gui-SayAs",
+      "releaseType": "draft"
     }
   }
 }
