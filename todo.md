@@ -3,7 +3,7 @@
 ## Project Overview
 CLI + API + WebUI + **Desktop App** text-to-speech using Chatterbox with custom voices, voice morphing, audio effects, and more.
 
-**Current Status**: Electron Desktop App Working! 🚀
+**Current Status**: READY FOR BUILD! 🚀
 
 ---
 
@@ -32,20 +32,26 @@ CLI + API + WebUI + **Desktop App** text-to-speech using Chatterbox with custom 
 - ✅ App icon (SVG)
 - ✅ **WORKING**: Tested and generates speech!
 
+### UI Improvements
+- ✅ Tab-based layout (4 tabs!)
+  - 🎤 Voice Generator
+  - 🎙️ Create New Voice
+  - 🔌 API & Connect
+  - 📖 Documentation (embedded docs/index.html)
+- ✅ Input clears after generation (model stays in RAM)
+- ✅ API server starts automatically with app
+- ✅ App only exits when user clicks X
+
 ---
 
-## In Progress 🚧
+## Ready to Build 🚀
 
-### UI Improvements
-- [ ] Tab-based layout (Generator | Create Voice | API/Connect)
-- [ ] Keep model in RAM (don't exit after generation)
-- [ ] Start API server on app launch
-- [ ] Add API connection details in 3rd tab
-
-### Final Steps
-- [ ] Build Windows installer
-- [ ] Test standalone .exe
-- [ ] Update all documentation
+### Windows Installer Build
+```bash
+cd electron-app
+# Run as Administrator for best results
+npm run build:win
+```
 
 ---
 
@@ -71,11 +77,11 @@ SayAs Kate "Long text..."           # Auto-splits if 900+ chars!
 # Open: http://localhost:7860
 ```
 
-### Electron App (NEW!)
+### Electron App
 ```bash
 cd electron-app
 .\start.bat          # Development
-.\build.bat          # Build installer
+.\build.bat          # Build installer (as Admin)
 ```
 
 ### Dashboard
@@ -104,7 +110,7 @@ Open `dashboard.html` in browser for full control center.
 
 ### UI
 - ✅ CLI with simple syntax
-- ✅ Gradio WebUI (pink notebook theme)
+- ✅ Gradio WebUI (pink notebook theme, 4 tabs!)
 - ✅ Interactive HTML Dashboard
 - ✅ API with Swagger docs
 - ✅ **Electron Desktop App** (Windows .exe)
@@ -123,7 +129,7 @@ SayAs/
 ├── src/
 │   ├── sayas.py        # CLI app
 │   ├── api.py          # FastAPI server
-│   ├── webui.py        # Gradio UI (with voice upload!)
+│   ├── webui.py        # Gradio UI (4 tabs!)
 │   └── text_splitter.py # Long text handling
 ├── voices/             # Custom voice samples
 ├── output/             # Generated audio
@@ -135,7 +141,7 @@ SayAs/
 │   ├── webui-guide.md
 │   ├── project-memory.md
 │   └── index.html      # Pink notebook docs site
-├── electron-app/       # NEW! Desktop app
+├── electron-app/       # Desktop app
 │   ├── src/
 │   │   ├── main/
 │   │   ├── preload/
@@ -162,6 +168,7 @@ SayAs/
 ## Git History
 
 ```
+d9a7312 UI improvements: tabs, API auto-start, keep model loaded 💕
 50dfb6d Electron app working! 💕🎮
 809c7a1 Add Electron app build config and gitignore 💕
 6ceb3a5 Added WebUI voice upload feature 💕
@@ -180,7 +187,7 @@ SayAs/
 - All docs in `/docs` as .md files
 - Long text (900+ chars) auto-splits with custom voices
 - 0.5s silence between chunks by default
-- **NEW**: WebUI has voice upload feature!
+- **NEW**: WebUI has 4 tabs including embedded documentation!
 - **NEW**: Electron desktop app - WORKING!
 
 ---
@@ -200,6 +207,7 @@ npm install
 
 ### 3. Build Windows Installer
 ```bash
+# Run as Administrator
 .\build.bat
 ```
 

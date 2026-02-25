@@ -578,8 +578,18 @@ with gr.Blocks(css=custom_css, title="💕 SayAs - Beautiful TTS") as demo:
                 ### Need Help?
                 
                 - 📚 Full API docs: http://localhost:8765/docs
-                - 📖 Documentation: See `/docs` folder
+                - 📖 Documentation: See `/docs` folder or Documentation tab
                 - 💕 Made with love!
+            """)
+
+        # Tab 4: Documentation
+        with gr.TabItem("📖 Documentation", id=4):
+            gr.HTML("""
+                <iframe 
+                    src="docs/index.html" 
+                    style="width: 100%; height: 700px; border: none; border-radius: 15px;"
+                    title="SayAs Documentation">
+                </iframe>
             """)
 
     gr.HTML("""
