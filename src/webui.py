@@ -73,15 +73,20 @@ def play_audio(wav: torch.Tensor, sample_rate: int):
 
 def generate_speech(voice_name, text, play_on_server):
     global model
-    
+
     if model is None:
         return "❌ Model not loaded yet. Please wait...", None
-    
+
     if not text.strip():
         return "⚠️ Please enter some text to speak!", None
+
+    # Clean voice name (handle list or string)
+    if isinstance(voice_name, list):
+        voice_name = voice_name[0] if voice_name else "Default Voice"
+    if voice_name is None:
+        voice_name = "Default Voice"
     
-    # Clean voice name
-    voice = voice_name.replace("🌸 ", "").replace("💕 ", "")
+    voice = str(voice_name).replace("🌸 ", "").replace("💕 ", "")
     
     # Find voice file
     voice_path = None
@@ -280,7 +285,7 @@ with gr.Blocks(css=custom_css, title="💕 SayAs - Beautiful TTS") as demo:
         
         with gr.Column(scale=2):
             voice_dropdown = gr.Dropdown(
-                choices=get_available_voices(),
+                choices=["🌸 Default Voice"],
                 value="🌸 Default Voice",
                 label="💕 Choose Your Voice",
                 interactive=True
