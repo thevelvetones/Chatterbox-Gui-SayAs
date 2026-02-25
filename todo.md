@@ -1,29 +1,37 @@
-# SayAs - LUDICUS OVERKILL Edition
+# SayAs - LUDICUS OVERKILL Edition 💕🎮
 
 ## Project Overview
 CLI + API + WebUI text-to-speech using Chatterbox with custom voices, voice morphing, audio effects, and more.
 
-**Status**: IN PROGRESS 🚧 - Long Text Support
+**Current Status**: Building Electron Desktop App! 🚀
 
 ---
 
-## In Progress
+## Completed ✅
 
-### Long Text Support 🔧
+### Long Text Support
+- ✅ Text splitter utility with sentence-aware chunking
+- ✅ Audio stitching with configurable silence gaps
+- ✅ CLI auto-split for 900+ char texts
+- ✅ API auto-split with response flag
+- ✅ Abbreviation handling (Mr., Dr., St., etc.)
 
-Chatterbox TTS has a ~1000 character/token limit when using voice cloning (custom voice samples). When text exceeds this limit, it errors out.
+---
 
-**Solution**: Split long text into sentences, process each chunk, then stitch audio together with configurable silence gaps.
+## In Progress 🚧
+
+### Electron Desktop App
+Wrapping SayAs in a standalone Windows executable!
 
 **Tasks**:
-- [ ] Research exact Chatterbox TTS character/token limits
-- [ ] Add text splitting utility (sentence-aware)
-- [ ] Implement audio stitching with 0.5s silence between segments
-- [ ] Update CLI to auto-split long text
-- [ ] Update API /sayas endpoint for automatic handling
-- [ ] Add config for silence duration
-- [ ] Test with 10000+ character texts
-- [ ] Document in usage.md
+- [x] Add voice upload feature to WebUI
+- [ ] Project folder restructuring
+- [ ] Create Electron main process
+- [ ] Create Electron preload script
+- [ ] Build WebUI for Electron
+- [ ] Configure electron-builder
+- [ ] Build Windows .exe installer
+- [ ] Test standalone functionality
 
 ---
 
@@ -34,17 +42,18 @@ Chatterbox TTS has a ~1000 character/token limit when using voice cloning (custo
 .\listVoices.bat                    # List available voices
 SayAs Kate "Hello world"            # Speak with default voice
 SayAs Kate "Hello" -output out.wav  # Save to file
+SayAs Kate "Long text..."           # Auto-splits if 900+ chars!
 ```
 
 ### API (Port 8765)
 ```bash
-.\start-api.bat   # Start API server
+.\start-api.bat
 # Docs: http://localhost:8765/docs
 ```
 
 ### WebUI (Port 7860)
 ```bash
-.\start-webui.bat  # Start Gradio UI
+.\start-webui.bat
 # Open: http://localhost:7860
 ```
 
@@ -60,6 +69,7 @@ Open `dashboard.html` in browser for full control center.
 - ✅ Custom voice cloning (.wav/.mp3 samples)
 - ✅ GPU accelerated (GTX 1050) + CPU fallback
 - ✅ PyAudio playback (no external players)
+- ✅ **Long text auto-splitting** (900+ chars)
 
 ### OVERKILL (API)
 - ✅ Voice Morphing (pitch, speed, volume)
@@ -76,6 +86,7 @@ Open `dashboard.html` in browser for full control center.
 - ✅ Gradio WebUI (pink notebook theme)
 - ✅ Interactive HTML Dashboard
 - ✅ API with Swagger docs
+- 🚧 Electron Desktop App (in progress)
 
 ---
 
@@ -91,14 +102,15 @@ SayAs/
 ├── src/
 │   ├── sayas.py        # CLI app
 │   ├── api.py          # FastAPI server
-│   └── webui.py        # Gradio UI
+│   ├── webui.py        # Gradio UI
+│   └── text_splitter.py # Long text handling
 ├── voices/             # Custom voice samples
 ├── output/             # Generated audio
 ├── presets/            # Voice presets
 ├── venv/               # Python virtual environment
 ├── docs/               # Documentation
 ├── README.md
-└── todo.md
+└── todo.md             # This file!
 ```
 
 ---
@@ -115,6 +127,9 @@ SayAs/
 ## Git History
 
 ```
+221e5f5 Add temp_output.wav to .gitignore 💕
+849d03e Add long text support with auto-splitting 💕
+578b349 Complete documentation with pink notebook theme
 c7cbf8a Fix WebUI dropdown voice handling
 9faec13 Add listVoices.bat
 385f6b0 Final polish: README + project memory
@@ -131,9 +146,11 @@ c7f99f9 Initial commit: SayAs CLI v1.0
 - Voice samples go in `voices/` folder
 - Presets saved to `presets/` folder
 - All docs in `/docs` as .md files
+- Long text (900+ chars) auto-splits with custom voices
+- 0.5s silence between chunks by default
 
 ---
 
 **--yolo! 💕🎮✨**
 
-*Made with love and way too many features*
+*Made with excessive love and way too many features*
