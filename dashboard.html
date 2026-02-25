@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 SayAs Control Center - LUDICUS OVERKILL</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Notebook paper effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 80px;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #e91e63 0%, #e91e63 100%);
+            opacity: 0.4;
+            z-index: -1;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 31px,
+                rgba(233, 30, 99, 0.08) 32px
+            );
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(233, 30, 99, 0.4);
+            border: 4px solid #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '💖';
+            position: absolute;
+            font-size: 15em;
+            opacity: 0.1;
+            left: -50px;
+            top: -50px;
+        }
+        
+        header::after {
+            content: '🎮';
+            position: absolute;
+            font-size: 15em;
+            opacity: 0.1;
+            right: -50px;
+            bottom: -50px;
+        }
+        
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4em;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #fce4ec;
+            font-size: 1.3em;
+        }
+        
+        .status-bar {
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            border: 3px solid #ec407a;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.2);
+        }
+        
+        .status-item {
+            text-align: center;
+        }
+        
+        .status-label {
+            color: #880e4f;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            color: #d81b60;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            border: 3px dashed #ec407a;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.2);
+        }
+        
+        .card h2 {
+            font-family: 'Dancing Script', cursive;
+            color: #d81b60;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #880e4f;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #f48fb1;
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #ec407a;
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.5);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .range-group input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border: none;
+            -webkit-appearance: none;
+            background: #f48fb1;
+            border-radius: 4px;
+        }
+        
+        .range-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ec407a;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .range-value {
+            min-width: 50px;
+            text-align: center;
+            color: #d81b60;
+            font-weight: 700;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fce4ec;
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+            accent-color: #ec407a;
+        }
+        
+        .output-area {
+            background: #fce4ec;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .output-area audio {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+        
+        .log-area {
+            background: #263238;
+            color: #aed581;
+            border-radius: 15px;
+            padding: 20px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+        }
+        
+        .log-info { color: #4fc3f7; }
+        .log-success { color: #aed581; }
+        .log-error { color: #e57373; }
+        .log-warning { color: #ffb74d; }
+        
+        footer {
+            text-align: center;
+            color: #880e4f;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .heart-animation {
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            animation: sparkle 2s infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            background: #fce4ec;
+            border: 2px solid #f48fb1;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Nunito', sans-serif;
+            color: #880e4f;
+        }
+        
+        .preset-btn:hover {
+            background: #ec407a;
+            color: white;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span class="heart-animation">💕</span> SayAs Control Center <span class="heart-animation">💕</span></h1>
+            <p class="subtitle">🎮 LUDICUS OVERKILL Edition - Everything You Never Knew You Needed 🎮</p>
+        </header>
+        
+        <div class="status-bar" id="statusBar">
+            <div class="status-item">
+                <div class="status-label">🖥️ API Status</div>
+                <div class="status-value" id="apiStatus">Checking...</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">🎵 GPU</div>
+                <div class="status-value" id="gpuStatus">Checking...</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">🎤 Voices</div>
+                <div class="status-value" id="voicesCount">-</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">💾 Presets</div>
+                <div class="status-value" id="presetsCount">-</div>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <!-- Quick TTS -->
+            <div class="card">
+                <h2>✨ Quick Speak</h2>
+                <div class="form-group">
+                    <label>💕 Voice</label>
+                    <select id="voice">
+                        <option value="Default Voice">🌸 Default Voice</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>✨ Text to Speak</label>
+                    <textarea id="text" placeholder="Type your magical words here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>🔊 Output Mode</label>
+                    <select id="outputMode">
+                        <option value="play">🔊 Play Only</option>
+                        <option value="return">💾 Download Only</option>
+                        <option value="both">🔊 + 💾 Both</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="speak()">💖 Speak It! 💖</button>
+                <div class="output-area" id="outputArea" style="display: none;">
+                    <audio id="audioPlayer" controls></audio>
+                </div>
+            </div>
+            
+            <!-- Voice Morphing -->
+            <div class="card">
+                <h2>🎛️ Voice Morphing</h2>
+                <div class="form-group">
+                    <label>🎵 Pitch <span id="pitchValue">1.0</span></label>
+                    <div class="range-group">
+                        <input type="range" id="pitch" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateRange('pitch')">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>⚡ Speed <span id="speedValue">1.0</span></label>
+                    <div class="range-group">
+                        <input type="range" id="speed" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateRange('speed')">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>📢 Volume <span id="volumeValue">1.0</span></label>
+                    <div class="range-group">
+                        <input type="range" id="volume" min="0.1" max="2.0" step="0.1" value="1.0" oninput="updateRange('volume')">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Audio Effects -->
+            <div class="card">
+                <h2>🎨 Audio Effects</h2>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="reverb"> 🏔️ Reverb
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="echo"> 🔊 Echo
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="chorus"> 🎵 Chorus
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="distortion"> ⚡ Distortion
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="normalize" checked> 📊 Normalize
+                    </label>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>🎼 Background Music (optional)</label>
+                    <input type="text" id="bgMusic" placeholder="Path to background music file">
+                </div>
+                <div class="form-group">
+                    <label>🎚️ Background Volume <span id="bgVolumeValue">0.3</span></label>
+                    <div class="range-group">
+                        <input type="range" id="bgVolume" min="0" max="1" step="0.1" value="0.3" oninput="updateRange('bgVolume')">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Presets -->
+            <div class="card">
+                <h2>💾 Voice Presets</h2>
+                <div class="form-group">
+                    <label>Save Current Settings as Preset</label>
+                    <input type="text" id="presetName" placeholder="My Awesome Preset">
+                </div>
+                <button class="btn" onclick="savePreset()" style="margin-bottom: 15px;">💾 Save Preset</button>
+                <label>Available Presets:</label>
+                <div class="preset-grid" id="presetGrid">
+                    <!-- Presets loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Batch Processing -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>📦 Batch Processing</h2>
+            <div class="form-group">
+                <label>📝 Enter texts (one per line)</label>
+                <textarea id="batchTexts" placeholder="Line 1&#10;Line 2&#10;Line 3" style="min-height: 150px;"></textarea>
+            </div>
+            <button class="btn" onclick="batchProcess()" style="width: auto; padding: 15px 40px;">📦 Process Batch</button>
+        </div>
+        
+        <!-- Activity Log -->
+        <div class="card">
+            <h2>📜 Activity Log</h2>
+            <div class="log-area" id="logArea">
+                <div class="log-entry log-info">[System] Control Center initialized 💕</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><span class="heart-animation">💕</span> SayAs v3.0 - LUDICUS OVERKILL Edition <span class="heart-animation">💕</span></p>
+            <p>🎮 Made with excessive love and too many features 🎮</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <a href="http://localhost:8765/docs" target="_blank" style="color: #d81b60;">📚 API Docs</a> | 
+                <a href="http://localhost:7860" target="_blank" style="color: #d81b60;">🌸 Gradio UI</a>
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8765';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkStatus();
+            loadVoices();
+            loadPresets();
+            createSparkles();
+        });
+        
+        // Create sparkle effects
+        function createSparkles() {
+            for (let i = 0; i < 20; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.innerHTML = ['✨', '💖', '⭐', '💕'][Math.floor(Math.random() * 4)];
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
+                sparkle.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(sparkle);
+            }
+        }
+        
+        // Update range display
+        function updateRange(id) {
+            const value = document.getElementById(id).value;
+            const display = document.getElementById(id + 'Value');
+            if (display) display.textContent = value;
+        }
+        
+        // Log function
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        // Check API status
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                document.getElementById('apiStatus').textContent = '✅ Online';
+                document.getElementById('apiStatus').style.color = '#4caf50';
+                document.getElementById('gpuStatus').textContent = data.gpu_available ? `✅ ${data.gpu_name || 'GPU'}` : '⚠️ CPU Only';
+                document.getElementById('gpuStatus').style.color = data.gpu_available ? '#4caf50' : '#ff9800';
+                document.getElementById('voicesCount').textContent = data.voices_count;
+                document.getElementById('presetsCount').textContent = data.presets_count;
+                
+                log('Connected to API server', 'success');
+            } catch (error) {
+                document.getElementById('apiStatus').textContent = '❌ Offline';
+                document.getElementById('apiStatus').style.color = '#f44336';
+                log('Cannot connect to API server. Is it running?', 'error');
+            }
+        }
+        
+        // Load voices
+        async function loadVoices() {
+            try {
+                const response = await fetch(`${API_URL}/voices`);
+                const data = await response.json();
+                
+                const select = document.getElementById('voice');
+                select.innerHTML = '<option value="Default Voice">🌸 Default Voice</option>';
+                
+                data.custom.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice;
+                    option.textContent = `💕 ${voice}`;
+                    select.appendChild(option);
+                });
+                
+                log(`Loaded ${data.custom.length + 1} voices`, 'success');
+            } catch (error) {
+                log('Failed to load voices', 'error');
+            }
+        }
+        
+        // Load presets
+        async function loadPresets() {
+            try {
+                const response = await fetch(`${API_URL}/presets`);
+                const data = await response.json();
+                
+                const grid = document.getElementById('presetGrid');
+                grid.innerHTML = '';
+                
+                data.presets.forEach(preset => {
+                    const btn = document.createElement('button');
+                    btn.className = 'preset-btn';
+                    btn.textContent = `💾 ${preset}`;
+                    btn.onclick = () => loadPreset(preset);
+                    grid.appendChild(btn);
+                });
+            } catch (error) {
+                // Presets might not exist yet
+            }
+        }
+        
+        // Save preset
+        async function savePreset() {
+            const name = document.getElementById('presetName').value;
+            if (!name) {
+                log('Please enter a preset name', 'warning');
+                return;
+            }
+            
+            const preset = {
+                name: name,
+                voice: document.getElementById('voice').value,
+                morphing: {
+                    pitch: parseFloat(document.getElementById('pitch').value),
+                    speed: parseFloat(document.getElementById('speed').value),
+                    volume: parseFloat(document.getElementById('volume').value)
+                },
+                effects: {
+                    reverb: document.getElementById('reverb').checked,
+                    echo: document.getElementById('echo').checked,
+                    chorus: document.getElementById('chorus').checked,
+                    distortion: document.getElementById('distortion').checked,
+                    normalize: document.getElementById('normalize').checked
+                }
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/presets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(preset)
+                });
+                
+                if (response.ok) {
+                    log(`Preset "${name}" saved!`, 'success');
+                    loadPresets();
+                }
+            } catch (error) {
+                log('Failed to save preset', 'error');
+            }
+        }
+        
+        // Load preset
+        async function loadPreset(name) {
+            try {
+                const response = await fetch(`${API_URL}/presets/${name}`);
+                const data = await response.json();
+                
+                document.getElementById('voice').value = data.voice;
+                document.getElementById('pitch').value = data.morphing.pitch;
+                document.getElementById('speed').value = data.morphing.speed;
+                document.getElementById('volume').value = data.morphing.volume;
+                document.getElementById('reverb').checked = data.effects.reverb;
+                document.getElementById('echo').checked = data.effects.echo;
+                document.getElementById('chorus').checked = data.effects.chorus;
+                document.getElementById('distortion').checked = data.effects.distortion;
+                document.getElementById('normalize').checked = data.effects.normalize;
+                
+                updateRange('pitch');
+                updateRange('speed');
+                updateRange('volume');
+                
+                log(`Preset "${name}" loaded!`, 'success');
+            } catch (error) {
+                log('Failed to load preset', 'error');
+            }
+        }
+        
+        // Speak function
+        async function speak() {
+            const text = document.getElementById('text').value;
+            if (!text) {
+                log('Please enter some text', 'warning');
+                return;
+            }
+            
+            const request = {
+                voice: document.getElementById('voice').value,
+                text: text,
+                output_mode: document.getElementById('outputMode').value,
+                morphing: {
+                    pitch: parseFloat(document.getElementById('pitch').value),
+                    speed: parseFloat(document.getElementById('speed').value),
+                    volume: parseFloat(document.getElementById('volume').value)
+                },
+                effects: {
+                    reverb: document.getElementById('reverb').checked,
+                    echo: document.getElementById('echo').checked,
+                    chorus: document.getElementById('chorus').checked,
+                    distortion: document.getElementById('distortion').checked,
+                    normalize: document.getElementById('normalize').checked
+                }
+            };
+            
+            const bgMusic = document.getElementById('bgMusic').value;
+            if (bgMusic) {
+                request.background_music = bgMusic;
+                request.background_volume = parseFloat(document.getElementById('bgVolume').value);
+            }
+            
+            log('Generating speech...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/sayas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(request)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log(`Speech generated! Duration: ${data.duration_seconds?.toFixed(2) || 'N/A'}s`, 'success');
+                    
+                    if (data.audio_base64) {
+                        const audioPlayer = document.getElementById('audioPlayer');
+                        const outputArea = document.getElementById('outputArea');
+                        audioPlayer.src = data.audio_url;
+                        outputArea.style.display = 'block';
+                        audioPlayer.play();
+                    }
+                }
+            } catch (error) {
+                log('Failed to generate speech: ' + error.message, 'error');
+            }
+        }
+        
+        // Batch process
+        async function batchProcess() {
+            const texts = document.getElementById('batchTexts').value.split('\n').filter(t => t.trim());
+            if (texts.length === 0) {
+                log('Please enter some texts', 'warning');
+                return;
+            }
+            
+            const request = {
+                items: texts.map(text => ({
+                    voice: document.getElementById('voice').value,
+                    text: text,
+                    morphing: {
+                        pitch: parseFloat(document.getElementById('pitch').value),
+                        speed: parseFloat(document.getElementById('speed').value),
+                        volume: parseFloat(document.getElementById('volume').value)
+                    }
+                })),
+                output_mode: 'save',
+                output_format: 'wav'
+            };
+            
+            log(`Processing ${texts.length} items...`, 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/batch`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(request)
+                });
+                
+                const data = await response.json();
+                log(`Batch complete! ${data.successful}/${data.total} successful`, 'success');
+                
+                data.results.forEach(r => {
+                    if (r.success) {
+                        log(`  ✓ Item ${r.index}: ${r.url || 'generated'}`, 'success');
+                    } else {
+                        log(`  ✗ Item ${r.index}: ${r.error}`, 'error');
+                    }
+                });
+            } catch (error) {
+                log('Batch processing failed', 'error');
+            }
+        }
+        
+        // Auto-refresh status
+        setInterval(checkStatus, 30000);
+    </script>
+</body>
+</html>
