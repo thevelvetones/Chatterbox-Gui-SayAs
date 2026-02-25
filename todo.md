@@ -1,135 +1,119 @@
 # SayAs - LUDICUS OVERKILL Edition
 
 ## Project Overview
-CLI + API + WebUI text-to-speech using Chatterbox (Resemble AI) with custom speaker voices, voice morphing, audio effects, batch processing, and EVERYTHING ELSE.
+CLI + API + WebUI text-to-speech using Chatterbox with custom voices, voice morphing, audio effects, and more.
 
-**Status**: COMPLETE --yolo! 🎮✨
+**Status**: COMPLETE ✅
 
-## Usage
+---
+
+## Quick Reference
 
 ### CLI
 ```bash
-SayAs Kate "This is what I want Kate to say in Kate Voice"
-SayAs Kate "text" -output path\to\file.wav
+.\listVoices.bat                    # List available voices
+SayAs Kate "Hello world"            # Speak with default voice
+SayAs Kate "Hello" -output out.wav  # Save to file
 ```
 
 ### API (Port 8765)
 ```bash
-POST /sayas - Generate speech with morphing/effects
-POST /batch - Batch processing
-POST /ssml - SSML-like advanced control
-GET  /voices - List voices
-GET  /presets - List presets
-WS   /stream - WebSocket streaming
+.\start-api.bat   # Start API server
+# Docs: http://localhost:8765/docs
 ```
 
-### WebUI
-- **Dashboard**: http://localhost:8765/dashboard.html
-- **Gradio UI**: http://localhost:7860
-- **API Docs**: http://localhost:8765/docs
+### WebUI (Port 7860)
+```bash
+.\start-webui.bat  # Start Gradio UI
+# Open: http://localhost:7860
+```
 
-## Tasks
+### Dashboard
+Open `dashboard.html` in browser for full control center.
 
-### Phase 1: Core Setup ✅
-- [x] Create project structure (docs, src, voices/)
-- [x] Set up Python virtual environment
-- [x] Install Chatterbox TTS dependencies
-- [x] Verify GPU availability (CUDA 11.8) with CPU fallback
+---
 
-### Phase 2: Voice Library ✅
-- [x] Implement voice sample storage (.wav/.mp3)
-- [x] Create speaker registration from voice samples
-- [x] Build speaker lookup/retrieval system
+## Features
 
-### Phase 3: CLI Implementation ✅
-- [x] Parse command line arguments (speaker, text, -output)
-- [x] Implement TTS generation with selected speaker
-- [x] Add immediate audio playback (Python player - no VLC)
-- [x] Add optional file output (-output <filepath>)
+### Core
+- ✅ Default Chatterbox TTS voice
+- ✅ Custom voice cloning (.wav/.mp3 samples)
+- ✅ GPU accelerated (GTX 1050) + CPU fallback
+- ✅ PyAudio playback (no external players)
 
-### Phase 4: Testing ✅
-- [x] Test GPU inference (GTX 1050)
-- [x] Test CPU fallback
-- [x] Test voice playback
-- [x] Test file output
-- [x] Test multiple speakers
+### OVERKILL (API)
+- ✅ Voice Morphing (pitch, speed, volume)
+- ✅ Audio Effects (reverb, echo, chorus, distortion)
+- ✅ Batch Processing
+- ✅ Voice Presets
+- ✅ SSML-like Markup
+- ✅ Background Music Mixing
+- ✅ Multiple Formats (wav, mp3, flac, ogg)
+- ✅ WebSocket Streaming
 
-### Phase 5: Documentation ✅
-- [x] Setup instructions
-- [x] Usage guide
-- [x] README.md
+### UI
+- ✅ CLI with simple syntax
+- ✅ Gradio WebUI (pink notebook theme)
+- ✅ Interactive HTML Dashboard
+- ✅ API with Swagger docs
 
-### Phase 6: API Server ✅
-- [x] REST API endpoint for TTS
-- [x] Speaker management via API
-- [x] Model persistence in memory
-- [x] Multiple output modes (play, return, both, save)
-
-### Phase 7: WebUI ✅
-- [x] Beautiful pink notebook-themed Gradio interface
-- [x] Interactive HTML dashboard
-- [x] Voice selection dropdown
-- [x] Real-time audio playback
-
-### Phase 8: LUDICUS OVERKILL Features ✅ 🎮
-- [x] Voice Morphing (pitch, speed, volume)
-- [x] Audio Effects (reverb, echo, chorus, distortion, normalize)
-- [x] Batch Processing
-- [x] Voice Presets (save/load)
-- [x] SSML-like Markup Support
-- [x] Background Music Mixing
-- [x] Multiple Output Formats (wav, mp3, flac, ogg)
-- [x] WebSocket Streaming
-- [x] Health Check Endpoint
-- [x] Interactive Control Dashboard
-
-### Phase 9: Future Enhancements (NOT YET - but who knows!)
-- [ ] Discord bot integration
-- [ ] Real-time voice changing
-- [ ] Multi-speaker conversations
-- [ ] Audio book generation
-- [ ] Cloud deployment
-
-## Notes
-- **GPU**: NVIDIA GeForce GTX 1050 (2GB VRAM)
-- **CUDA**: 11.8 required
-- **PyTorch**: 2.5.1+cu118
-- **Python audio player only** (no VLC/external players)
-- **Audio files only saved when -output specified** (CLI) or output_mode="save"/"return" (API)
-- **All docs in /docs folder as .md files**
+---
 
 ## Project Structure
+
 ```
 SayAs/
-├── sayas.bat              # CLI launcher
-├── start-api.bat          # API server launcher
-├── start-webui.bat        # WebUI launcher
-├── dashboard.html         # Interactive control dashboard
+├── sayas.bat           # CLI launcher
+├── listVoices.bat      # List voices
+├── start-api.bat       # API server
+├── start-webui.bat     # Gradio UI
+├── dashboard.html      # Control dashboard
 ├── src/
-│   ├── sayas.py           # CLI application
-│   ├── api.py             # FastAPI server (OVERKILL edition)
-│   └── webui.py           # Gradio WebUI
-├── voices/                # Custom voice samples
-├── output/                # Generated audio files
-├── presets/               # Voice presets
-├── venv/                  # Python virtual environment
-├── docs/
-│   ├── usage.md           # Full usage guide
-│   └── project-memory.md  # Project details
-├── README.md              # Quick start guide
-└── todo.md                # This file!
+│   ├── sayas.py        # CLI app
+│   ├── api.py          # FastAPI server
+│   └── webui.py        # Gradio UI
+├── voices/             # Custom voice samples
+├── output/             # Generated audio
+├── presets/            # Voice presets
+├── venv/               # Python virtual environment
+├── docs/               # Documentation
+├── README.md
+└── todo.md
 ```
 
-## OVERKILL Features Summary 🎮
-1. **Voice Morphing**: Adjust pitch (0.5-2.0x), speed (0.5-2.0x), volume (0-2.0x)
-2. **Audio Effects**: Reverb, echo, chorus, distortion, normalization
-3. **Batch Processing**: Process multiple texts at once
-4. **Voice Presets**: Save and load complete voice configurations
-5. **SSML Support**: Advanced markup for segment-by-segment control
-6. **Background Music**: Mix music with generated speech
-7. **Multiple Formats**: WAV, MP3, FLAC, OGG output
-8. **WebSocket Streaming**: Real-time TTS streaming
-9. **Interactive Dashboard**: Beautiful control center with all features
-10. **Health Monitoring**: API status, GPU info, voice/preset counts
+---
 
---yolo till you fail or want to talk! 💕🎮✨
+## Hardware
+
+- **GPU**: NVIDIA GTX 1050 (2GB VRAM)
+- **CUDA**: 11.8
+- **PyTorch**: 2.5.1+cu118
+- **Python**: 3.11
+
+---
+
+## Git History
+
+```
+c7cbf8a Fix WebUI dropdown voice handling
+9faec13 Add listVoices.bat
+385f6b0 Final polish: README + project memory
+7bf3049 LUDICUS OVERKILL update
+c7f99f9 Initial commit: SayAs CLI v1.0
+```
+
+---
+
+## Notes
+
+- Audio plays immediately by default (CLI/WebUI)
+- API has multiple output modes (play, return, both, save)
+- Voice samples go in `voices/` folder
+- Presets saved to `presets/` folder
+- All docs in `/docs` as .md files
+
+---
+
+**--yolo! 💕🎮✨**
+
+*Made with love and way too many features*
