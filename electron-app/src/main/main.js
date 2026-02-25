@@ -19,7 +19,8 @@ log.info('SayAs Electron App starting...');
 
 // Global references
 let mainWindow = null;
-let pythonProcess = null;
+let pythonWebuiProcess = null;
+let pythonApiProcess = null;
 let apiPort = 8765;
 let webuiPort = 7860;
 
@@ -105,7 +106,7 @@ function createWindow() {
 
 function startPythonBackend() {
   return new Promise((resolve, reject) => {
-    log.info('Starting Python WebUI backend...');
+    log.info('Starting Python backends (API + WebUI)...');
     log.info(`App path: ${appPath}`);
     log.info(`Python path: ${pythonPath}`);
     log.info(`WebUI script: ${webuiScript}`);
@@ -135,9 +136,38 @@ function startPythonBackend() {
       PATH: `${process.env.PATH};C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\\bin`
     };
 
-    // Spawn Python process
-    log.info('Spawning Python process...');
-    pythonProcess = spawn(pythonPath, [webuiScript], {
+    // Start API server first
+    const apiScript = path.join(appPath, 'src', 'api.py');
+    if (fs.existsSync(apiScript)) {
+      log.info('Spawning API server...');
+      pythonApiProcess = spawn(pythonPath, [apiScript], {
+        env,
+        cwd: appPath,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      pythonApiProcess.stdout.on('data', (data) => {
+        const output = data.toString();
+        log.info(`API: ${output}`);
+      });
+
+      pythonApiProcess.stderr.on('data', (data) => {
+        const error = data.toString();
+        log.info(`API: ${error}`);  // Log warnings as info
+      });
+
+      pythonApiProcess.on('error', (error) => {
+        log.error(`API server error: ${error.message}`);
+      });
+
+      pythonApiProcess.on('exit', (code, signal) => {
+        log.info(`API server exited with code: ${code}, signal: ${signal}`);
+      });
+    }
+
+    // Spawn WebUI process
+    log.info('Spawning WebUI process...');
+    pythonWebuiProcess = spawn(pythonPath, [webuiScript], {
       env,
       cwd: appPath,
       stdio: ['pipe', 'pipe', 'pipe']
@@ -145,9 +175,9 @@ function startPythonBackend() {
 
     let started = false;
 
-    pythonProcess.stdout.on('data', (data) => {
+    pythonWebuiProcess.stdout.on('data', (data) => {
       const output = data.toString();
-      log.info(`Python: ${output}`);
+      log.info(`WebUI: ${output}`);
       
       // Check if WebUI is ready
       if (output.includes('http://localhost:7860') && !started) {
@@ -157,9 +187,9 @@ function startPythonBackend() {
       }
     });
 
-    pythonProcess.stderr.on('data', (data) => {
+    pythonWebuiProcess.stderr.on('data', (data) => {
       const error = data.toString();
-      log.error(`Python Error: ${error}`);
+      log.info(`WebUI: ${error}`);  // Log warnings as info
       
       // Send error to renderer
       if (mainWindow) {
@@ -167,39 +197,44 @@ function startPythonBackend() {
       }
     });
 
-    pythonProcess.on('error', (error) => {
-      log.error(`Failed to start Python: ${error.message}`);
+    pythonWebuiProcess.on('error', (error) => {
+      log.error(`Failed to start WebUI: ${error.message}`);
       log.error(`Error code: ${error.code}`);
       log.error(`Error syscall: ${error.syscall}`);
       reject(error);
     });
 
-    pythonProcess.on('exit', (code, signal) => {
-      log.info(`Python process exited with code: ${code}, signal: ${signal}`);
+    pythonWebuiProcess.on('exit', (code, signal) => {
+      log.info(`WebUI exited with code: ${code}, signal: ${signal}`);
       if (mainWindow) {
         mainWindow.webContents.send('python-exit', code);
       }
       if (!started) {
-        reject(new Error(`Python exited with code ${code} before starting WebUI`));
+        reject(new Error(`WebUI exited with code ${code} before starting`));
       }
     });
 
-    // Timeout after 60 seconds
+    // Timeout after 90 seconds (API + WebUI need time to load models)
     setTimeout(() => {
       if (!started) {
-        const errorMsg = 'Python backend failed to start within 60 seconds';
+        const errorMsg = 'Python backend failed to start within 90 seconds';
         log.error(errorMsg);
         reject(new Error(errorMsg));
       }
-    }, 60000);
+    }, 90000);
   });
 }
 
 function stopPythonBackend() {
-  if (pythonProcess) {
-    log.info('Stopping Python backend...');
-    pythonProcess.kill('SIGTERM');
-    pythonProcess = null;
+  if (pythonApiProcess) {
+    log.info('Stopping API server...');
+    pythonApiProcess.kill('SIGTERM');
+    pythonApiProcess = null;
+  }
+  if (pythonWebuiProcess) {
+    log.info('Stopping WebUI...');
+    pythonWebuiProcess.kill('SIGTERM');
+    pythonWebuiProcess = null;
   }
 }
 

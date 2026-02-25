@@ -3,8 +3,10 @@ SayAs WebUI - Beautiful pink notebook-themed interface
 Built with Gradio
 
 Features:
+- Tab-based layout (Generator | Create Voice | API/Connect)
 - Text-to-speech with custom voices
 - Voice upload and management
+- API connection details
 - Pink notebook theme
 """
 
@@ -46,7 +48,7 @@ def get_device():
 def load_model():
     global model, device
     device = get_device()
-    print(f"🎤 Loading Chatterbox TTS model on {device}...")
+    print(f"💖 Loading Chatterbox TTS model on {device}...")
     model = ChatterboxTTS.from_pretrained(device=device)
     print(f"✅ Model loaded!")
     return model
@@ -99,10 +101,10 @@ def generate_speech(voice_name, text, play_on_server):
     global model
 
     if model is None:
-        return "❌ Model not loaded yet. Please wait...", None
+        return "❌ Model not loaded yet. Please wait...", None, ""
 
-    if not text.strip():
-        return "⚠️ Please enter some text to speak!", None
+    if not text or not text.strip():
+        return "⚠️ Please enter some text to speak!", None, ""
 
     # Clean voice name (handle list or string)
     if isinstance(voice_name, list):
@@ -142,10 +144,11 @@ def generate_speech(voice_name, text, play_on_server):
         duration = len(wav[0]) / model.sr
         status = f"✅ Success! Generated {duration:.2f}s of speech with {'custom' if voice_path else 'default'} voice"
 
-        return status, str(output_path)
+        # Clear input and return status
+        return status, str(output_path), ""
 
     except Exception as e:
-        return f"❌ Error: {str(e)}", None
+        return f"❌ Error: {str(e)}", None, text
 
 
 def upload_voice(voice_name, audio_file):
@@ -160,17 +163,17 @@ def upload_voice(voice_name, audio_file):
         Status message and updated voices list
     """
     if not voice_name or not voice_name.strip():
-        return "⚠️ Please enter a voice name!", get_voices_list()
+        return "⚠️ Please enter a voice name!", get_voices_list(), ""
     
     if audio_file is None:
-        return "⚠️ Please select an audio file!", get_voices_list()
+        return "⚠️ Please select an audio file!", get_voices_list(), ""
     
     # Clean the voice name
     voice_name = voice_name.strip()
     voice_name = "".join(c for c in voice_name if c.isalnum() or c in (' ', '-', '_'))
     
     if not voice_name:
-        return "⚠️ Invalid voice name!", get_voices_list()
+        return "⚠️ Invalid voice name!", get_voices_list(), ""
     
     try:
         # Determine file extension from uploaded file
@@ -187,10 +190,10 @@ def upload_voice(voice_name, audio_file):
         
         print(f"💾 Voice saved: {voice_name}{file_ext}")
         
-        return f"✅ Voice '{voice_name}' saved successfully!", get_voices_list()
+        return f"✅ Voice '{voice_name}' saved successfully!", get_voices_list(), ""
     
     except Exception as e:
-        return f"❌ Error saving voice: {str(e)}", get_voices_list()
+        return f"❌ Error saving voice: {str(e)}", get_voices_list(), voice_name
 
 
 def delete_voice(voice_name):
@@ -351,16 +354,19 @@ label {
     font-weight: 600 !important;
 }
 
-/* Voice list */
-.voice-list {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 15px;
-    padding: 15px;
-    margin: 10px 0;
+/* Tab styling */
+.tab-nav {
+    background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%) !important;
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.tab-nav button {
+    font-family: 'Dancing Script', cursive !important;
+    font-size: 1.2em !important;
 }
 """
 
-# Create the interface
+# Create the interface with tabs
 with gr.Blocks(css=custom_css, title="💕 SayAs - Beautiful TTS") as demo:
 
     gr.HTML("""
@@ -371,164 +377,232 @@ with gr.Blocks(css=custom_css, title="💕 SayAs - Beautiful TTS") as demo:
         </div>
     """)
 
-    # Main TTS Section
-    with gr.Row():
-        with gr.Column(scale=1):
+    # Create tabs
+    with gr.Tabs() as tabs:
+        
+        # Tab 1: Voice Generator
+        with gr.TabItem("🎤 Voice Generator", id=1):
             gr.Markdown("""
-                ## 🌸 Welcome to SayAs!
-
-                *Your beautiful text-to-speech companion*
-
-                ### How to use:
-                1. 💕 Pick a voice from the dropdown
-                2. ✨ Type your message
-                3. 🎵 Click "Speak It!" to hear it
-                4. 💖 Download if you want to save it
-
-                ---
-
-                **💡 Tip:** Upload your own voice samples below!
+                ## ✨ Generate Speech
+            
+                Type your text and select a voice to generate speech!
             """)
-
-            with gr.Group():
-                gr.HTML("""
-                    <div style="text-align: center; font-size: 1.5em; margin: 10px;">
-                        💗 Made with love 💗
-                    </div>
-                """)
-
-        with gr.Column(scale=2):
-            voice_dropdown = gr.Dropdown(
-                choices=["🌸 Default Voice"],
-                value="🌸 Default Voice",
-                label="💕 Choose Your Voice",
-                interactive=True
-            )
-
-            text_input = gr.Textbox(
-                label="✨ What should I say?",
-                placeholder="Type your message here, darling...",
-                lines=4,
-                max_lines=10
-            )
-
-            play_checkbox = gr.Checkbox(
-                label="🔊 Play on server speakers",
-                value=True
-            )
-
-            speak_button = gr.Button(
-                "💖 Speak It! 💖",
-                variant="primary",
-                size="lg"
-            )
-
-            status_output = gr.Textbox(
-                label="📝 Status",
-                interactive=False,
-                elem_id="status-box"
-            )
-
-            audio_output = gr.Audio(
-                label="🎵 Your Audio",
-                type="filepath"
-            )
-
-    gr.HTML("""
-        <hr style="border: 2px dashed #ec407a; margin: 30px 0;">
-    """)
-
-    # Voice Management Section
-    gr.Markdown("""
-        ## 🎤 Voice Management
-        
-        Upload your own voice samples (.wav or .mp3) to create custom voices!
-        
-        **Tips for best results:**
-        - Use clear, high-quality recordings (10+ seconds)
-        - WAV format preferred over MP3
-        - Name your voice something memorable
-    """)
-
-    with gr.Row():
-        # Upload Section
-        with gr.Column(scale=1):
-            gr.Markdown("### ➕ Add New Voice")
-            
-            voice_name_input = gr.Textbox(
-                label="🏷️ Voice Name",
-                placeholder="e.g., Kate, John, MyVoice",
-                interactive=True
-            )
-            
-            voice_file_upload = gr.File(
-                label="📁 Upload Audio File",
-                file_types=[".wav", ".mp3"],
-                interactive=True
-            )
-            
-            upload_button = gr.Button(
-                "💾 Save Voice",
-                variant="primary",
-                size="lg"
-            )
-            
-            upload_status = gr.Textbox(
-                label="📝 Upload Status",
-                interactive=False,
-                elem_id="status-box"
-            )
-
-        # Voice List Section
-        with gr.Column(scale=1):
-            gr.Markdown("### 📋 Existing Voices")
-            
-            voices_list_display = gr.List(
-                label="Your Voices",
-                value=[["📭 No custom voices yet - upload one!"]],
-                interactive=False
-            )
             
             with gr.Row():
-                voice_to_delete = gr.Dropdown(
-                    choices=[],
-                    label="🗑️ Select Voice to Delete",
-                    interactive=True
+                with gr.Column(scale=2):
+                    voice_dropdown = gr.Dropdown(
+                        choices=["🌸 Default Voice"],
+                        value="🌸 Default Voice",
+                        label="💕 Choose Your Voice",
+                        interactive=True
+                    )
+
+                    text_input = gr.Textbox(
+                        label="✨ What should I say?",
+                        placeholder="Type your message here, darling...",
+                        lines=4,
+                        max_lines=10
+                    )
+
+                    play_checkbox = gr.Checkbox(
+                        label="🔊 Play on server speakers",
+                        value=True
+                    )
+
+                    speak_button = gr.Button(
+                        "💖 Speak It! 💖",
+                        variant="primary",
+                        size="lg"
+                    )
+
+                    status_output = gr.Textbox(
+                        label="📝 Status",
+                        interactive=False,
+                        elem_id="status-box"
+                    )
+
+                    audio_output = gr.Audio(
+                        label="🎵 Your Audio",
+                        type="filepath"
+                    )
+                
+                with gr.Column(scale=1):
+                    gr.Markdown("""
+                        ### 💡 Tips
+                        
+                        - Use clear, natural text
+                        - Custom voices clone from samples
+                        - Long text auto-splits!
+                        - Keep model loaded for fast generation
+                    """)
+                    
+                    with gr.Group():
+                        gr.HTML("""
+                            <div style="text-align: center; font-size: 1.5em; margin: 10px;">
+                                💗 Made with love 💗
+                            </div>
+                        """)
+
+        # Tab 2: Create New Voice
+        with gr.TabItem("🎙️ Create New Voice", id=2):
+            gr.Markdown("""
+                ## 🎙️ Voice Management
+                
+                Upload your own voice samples (.wav or .mp3) to create custom voices!
+                
+                **Tips for best results:**
+                - Use clear, high-quality recordings (10+ seconds)
+                - WAV format preferred over MP3
+                - Name your voice something memorable
+            """)
+            
+            with gr.Row():
+                # Upload Section
+                with gr.Column(scale=1):
+                    gr.Markdown("### ➕ Add New Voice")
+                    
+                    voice_name_input = gr.Textbox(
+                        label="🏷️ Voice Name",
+                        placeholder="e.g., Kate, John, MyVoice",
+                        interactive=True
+                    )
+                    
+                    voice_file_upload = gr.File(
+                        label="📁 Upload Audio File",
+                        file_types=[".wav", ".mp3"],
+                        interactive=True
+                    )
+                    
+                    upload_button = gr.Button(
+                        "💾 Save Voice",
+                        variant="primary",
+                        size="lg"
+                    )
+                    
+                    upload_status = gr.Textbox(
+                        label="📝 Upload Status",
+                        interactive=False,
+                        elem_id="status-box"
+                    )
+
+                # Voice List Section
+                with gr.Column(scale=1):
+                    gr.Markdown("### 📋 Existing Voices")
+                    
+                    voices_list_display = gr.List(
+                        label="Your Voices",
+                        value=[["📭 No custom voices yet - upload one!"]],
+                        interactive=False
+                    )
+                    
+                    with gr.Row():
+                        voice_to_delete = gr.Dropdown(
+                            choices=[],
+                            label="🗑️ Select Voice to Delete",
+                            interactive=True
+                        )
+                        
+                        delete_button = gr.Button(
+                            "❌ Delete",
+                            variant="stop",
+                            size="lg"
+                        )
+                    
+                    delete_status = gr.Textbox(
+                        label="📝 Delete Status",
+                        interactive=False
+                    )
+
+        # Tab 3: API & Connect
+        with gr.TabItem("🔌 API & Connect", id=3):
+            gr.Markdown("""
+                ## 🔌 API Connection Details
+                
+                Connect to SayAs programmatically!
+                
+                ### Local API Server
+                - **Base URL**: `http://localhost:8765`
+                - **Swagger Docs**: http://localhost:8765/docs
+                - **Status**: Start with `.\start-api.bat`
+                
+                ### WebUI
+                - **URL**: http://localhost:7860
+                - **Start**: `.\start-webui.bat`
+                
+                ---
+                
+                ### Example API Request
+                
+                ```bash
+                curl -X POST http://localhost:8765/sayas \\
+                  -H "Content-Type: application/json" \\
+                  -d '{
+                    "voice": "Kate",
+                    "text": "Hello world!",
+                    "output_mode": "both"
+                  }'
+                ```
+                
+                ### Python Example
+                
+                ```python
+                import requests
+                
+                response = requests.post(
+                    'http://localhost:8765/sayas',
+                    json={
+                        'voice': 'Kate',
+                        'text': 'Hello!',
+                        'output_mode': 'return'
+                    }
                 )
                 
-                delete_button = gr.Button(
-                    "❌ Delete",
-                    variant="stop",
-                    size="lg"
-                )
-            
-            delete_status = gr.Textbox(
-                label="📝 Delete Status",
-                interactive=False
-            )
+                audio_data = response.json()['audio_base64']
+                ```
+                
+                ---
+                
+                ### Available Endpoints
+                
+                | Endpoint | Method | Description |
+                |----------|--------|-------------|
+                | `/voices` | GET | List available voices |
+                | `/sayas` | POST | Generate speech |
+                | `/batch` | POST | Batch processing |
+                | `/presets` | GET/POST | Voice presets |
+                | `/health` | GET | Health check |
+                | `/stream` | WS | WebSocket streaming |
+                
+                ---
+                
+                ### Need Help?
+                
+                - 📚 Full API docs: http://localhost:8765/docs
+                - 📖 Documentation: See `/docs` folder
+                - 💕 Made with love!
+            """)
 
     gr.HTML("""
         <footer>
-            <p>💕 SayAs v3.0 - Powered by Chatterbox TTS 💕</p>
+            <p>💕 SayAs v4.0 - Powered by Chatterbox TTS 💕</p>
             <p>✨ GPU Accelerated | 🎵 Custom Voices | 💖 Voice Upload | 🎮 OVERKILL Features</p>
         </footer>
     """)
 
-    # Event handlers
+    # Event handlers for Tab 1 (Generator)
     speak_button.click(
         fn=generate_speech,
         inputs=[voice_dropdown, text_input, play_checkbox],
-        outputs=[status_output, audio_output]
+        outputs=[status_output, audio_output, text_input]  # Clear input after generation
     )
 
-    # Voice upload
+    # Event handlers for Tab 2 (Voice Management)
     upload_button.click(
         fn=upload_voice,
         inputs=[voice_name_input, voice_file_upload],
-        outputs=[upload_status, voices_list_display]
+        outputs=[upload_status, voices_list_display, voice_name_input]  # Clear input after upload
     )
 
-    # Voice delete
     delete_button.click(
         fn=delete_voice,
         inputs=[voice_to_delete],
