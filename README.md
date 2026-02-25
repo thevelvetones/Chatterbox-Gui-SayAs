@@ -4,6 +4,11 @@
 
 ## Quick Start
 
+### List Voices
+```bash
+.\listVoices.bat
+```
+
 ### CLI
 ```bash
 SayAs Kate "This is what I want Kate to say in Kate Voice"
