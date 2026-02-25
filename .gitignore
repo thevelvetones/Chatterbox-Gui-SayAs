@@ -31,8 +31,12 @@ wheels/
 test_*.py
 test_*.wav
 test_output*.wav
-*.wav
-*.mp3
+
+# Audio output (but allow voices/)
+output/*.wav
+output/*.mp3
+output/*.flac
+output/*.ogg
 
 # OS
 .DS_Store

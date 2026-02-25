@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 SayAs Documentation - LUDICUS OVERKILL Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Notebook paper effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 80px;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #e91e63 0%, #e91e63 100%);
+            opacity: 0.4;
+            z-index: 1000;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 31px,
+                rgba(233, 30, 99, 0.08) 32px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Floating hearts background */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            animation: float-up 15s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(233, 30, 99, 0.4);
+            border: 4px solid #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '💖';
+            position: absolute;
+            font-size: 10em;
+            opacity: 0.1;
+            left: -30px;
+            top: -30px;
+        }
+
+        header::after {
+            content: '🎮';
+            position: absolute;
+            font-size: 10em;
+            opacity: 0.1;
+            right: -30px;
+            bottom: -30px;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4em;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #fce4ec;
+            font-size: 1.3em;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 3px dashed #ec407a;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        nav button {
+            background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+        }
+
+        nav button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.5);
+        }
+
+        nav button.active {
+            background: linear-gradient(135deg, #d81b60 0%, #ad1457 100%);
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+        }
+
+        /* Main content */
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            border: 3px dashed #ec407a;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.2);
+            margin-bottom: 30px;
+        }
+
+        /* Markdown styles */
+        .markdown-content {
+            line-height: 1.8;
+            color: #4a4a4a;
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3,
+        .markdown-content h4 {
+            font-family: 'Dancing Script', cursive;
+            color: #d81b60;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .markdown-content h1 {
+            font-size: 2.5em;
+            border-bottom: 3px dashed #f48fb1;
+            padding-bottom: 10px;
+        }
+
+        .markdown-content h2 {
+            font-size: 2em;
+        }
+
+        .markdown-content h3 {
+            font-size: 1.6em;
+        }
+
+        .markdown-content p {
+            margin-bottom: 15px;
+        }
+
+        .markdown-content a {
+            color: #ec407a;
+            text-decoration: none;
+            border-bottom: 2px solid #f48fb1;
+            transition: all 0.3s;
+        }
+
+        .markdown-content a:hover {
+            background: #fce4ec;
+            border-bottom-color: #d81b60;
+        }
+
+        .markdown-content code {
+            background: #fce4ec;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #880e4f;
+            border: 1px solid #f48fb1;
+        }
+
+        .markdown-content pre {
+            background: #263238;
+            color: #aed581;
+            padding: 20px;
+            border-radius: 15px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 3px solid #ec407a;
+        }
+
+        .markdown-content pre code {
+            background: transparent;
+            padding: 0;
+            border: none;
+            color: inherit;
+        }
+
+        .markdown-content ul,
+        .markdown-content ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        .markdown-content li {
+            margin-bottom: 8px;
+        }
+
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .markdown-content th {
+            background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .markdown-content td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f48fb1;
+        }
+
+        .markdown-content tr:nth-child(even) {
+            background: #fce4ec;
+        }
+
+        .markdown-content tr:hover {
+            background: #f8bbd9;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #ec407a;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #880e4f;
+            background: #fce4ec;
+            padding: 15px 20px;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .markdown-content hr {
+            border: none;
+            border-top: 3px dashed #ec407a;
+            margin: 30px 0;
+        }
+
+        .markdown-content img {
+            max-width: 100%;
+            border-radius: 15px;
+            border: 3px solid #f48fb1;
+            margin: 20px 0;
+        }
+
+        /* Loading spinner */
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #fce4ec;
+            border-top-color: #ec407a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: #880e4f;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        footer a {
+            color: #d81b60;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .heart-animation {
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Sparkle effect */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            animation: sparkle 2s infinite;
+            z-index: 2;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: #fce4ec;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #f48fb1;
+        }
+
+        .toc h3 {
+            color: #d81b60;
+            margin-bottom: 15px;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #880e4f;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            header {
+                padding: 25px;
+            }
+
+            .content-card {
+                padding: 20px;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav button {
+                width: 100%;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body::before,
+            body::after,
+            .floating-hearts,
+            nav,
+            footer {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .content-card {
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating hearts background -->
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <div class="container">
+        <header>
+            <h1><span class="heart-animation">💕</span> SayAs Documentation <span class="heart-animation">💕</span></h1>
+            <p class="subtitle">🎮 LUDICUS OVERKILL Edition - Complete Documentation 🎮</p>
+        </header>
+
+        <nav>
+            <button onclick="loadDoc('usage.md')" class="active" id="btn-usage">📖 Usage Guide</button>
+            <button onclick="loadDoc('api-reference.md')" id="btn-api">🔌 API Reference</button>
+            <button onclick="loadDoc('webui-guide.md')" id="btn-webui">🌸 WebUI Guide</button>
+            <button onclick="loadDoc('project-memory.md')" id="btn-memory">💾 Project Memory</button>
+        </nav>
+
+        <div class="content-card">
+            <div id="content" class="markdown-content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading documentation... 💕</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><span class="heart-animation">💕</span> SayAs v3.0 - LUDICUS OVERKILL Edition <span class="heart-animation">💕</span></p>
+            <p>🎮 Made with excessive love and too many features 🎮</p>
+            <p style="margin-top: 10px;">
+                <a href="http://localhost:8765/docs" target="_blank">📚 API Docs</a> |
+                <a href="http://localhost:7860" target="_blank">🌸 WebUI</a> |
+                <a href="dashboard.html" target="_blank">🎛️ Dashboard</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Create floating hearts
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            const hearts = ['💕', '💖', '💗', '💓', '💞', '✨', '⭐', '🎮'];
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 15 + 's';
+                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                container.appendChild(heart);
+            }
+        }
+
+        // Create sparkle effects
+        function createSparkles() {
+            for (let i = 0; i < 10; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.innerHTML = ['✨', '💖', '⭐', '💕'][Math.floor(Math.random() * 4)];
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
+                sparkle.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(sparkle);
+            }
+        }
+
+        // Load and render markdown
+        async function loadDoc(filename) {
+            const contentDiv = document.getElementById('content');
+            
+            // Update active button
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + filename.replace('.md', '')).classList.add('active');
+            
+            // Show loading
+            contentDiv.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading ${filename}... 💕</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${filename}`);
+                }
+                const markdown = await response.text();
+                
+                // Parse markdown with marked
+                const html = marked.parse(markdown);
+                contentDiv.innerHTML = html;
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #d81b60;">
+                        <p style="font-size: 3em;">❌</p>
+                        <p style="font-size: 1.5em;">Oops! Couldn't load ${filename}</p>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createFloatingHearts();
+            createSparkles();
+            loadDoc('usage.md');
+        });
+    </script>
+</body>
+</html>
