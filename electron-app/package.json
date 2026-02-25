@@ -54,20 +54,17 @@
       {
         "from": "python",
         "to": "python",
-        "filter": ["**/*"],
-        "optional": true
+        "filter": ["**/*"]
       },
       {
         "from": "voices",
         "to": "voices",
-        "filter": ["**/*"],
-        "optional": true
+        "filter": ["**/*"]
       },
       {
         "from": "presets",
         "to": "presets",
-        "filter": ["**/*"],
-        "optional": true
+        "filter": ["**/*"]
       }
     ],
     "win": {
