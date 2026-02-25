@@ -7,3 +7,6 @@ python/
 voices/
 presets/
 output/
+*.exe
+*.7z
+builder-debug.yml
