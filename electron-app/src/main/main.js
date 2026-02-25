@@ -25,8 +25,9 @@ let webuiPort = 7860;
 
 // Get paths
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+// In dev mode, use the known project root path
 const appPath = isDev 
-  ? path.join(__dirname, '../../..') 
+  ? 'C:\\Users\\User\\.qwen\\projects\\SayAs'  // Project root
   : path.dirname(app.getPath('exe'));
 
 const pythonPath = isDev
@@ -34,6 +35,12 @@ const pythonPath = isDev
   : path.join(process.resourcesPath, 'python', 'venv', 'Scripts', 'python.exe');
 
 const webuiScript = path.join(appPath, 'src', 'webui.py');
+
+// Log for debugging
+console.log('DEBUG: __dirname =', __dirname);
+console.log('DEBUG: appPath =', appPath);
+console.log('DEBUG: pythonPath =', pythonPath);
+console.log('DEBUG: webuiScript =', webuiScript);
 
 // User data paths
 const userDataPath = app.getPath('userData');
@@ -90,8 +97,8 @@ function createWindow() {
   });
 
   // Open DevTools in development
-  if (isDev) {
-    mainWindow.webPreferences.devTools = true;
+  if (isDev && mainWindow && mainWindow.webContents) {
+    mainWindow.webContents.devTools = true;
     // mainWindow.webContents.openDevTools();
   }
 }
@@ -99,17 +106,37 @@ function createWindow() {
 function startPythonBackend() {
   return new Promise((resolve, reject) => {
     log.info('Starting Python WebUI backend...');
+    log.info(`App path: ${appPath}`);
     log.info(`Python path: ${pythonPath}`);
     log.info(`WebUI script: ${webuiScript}`);
+    
+    // Check if python exists
+    const fs = require('fs');
+    if (!fs.existsSync(pythonPath)) {
+      const errorMsg = `Python not found at: ${pythonPath}`;
+      log.error(errorMsg);
+      reject(new Error(errorMsg));
+      return;
+    }
+    
+    if (!fs.existsSync(webuiScript)) {
+      const errorMsg = `WebUI script not found at: ${webuiScript}`;
+      log.error(errorMsg);
+      reject(new Error(errorMsg));
+      return;
+    }
 
     // Set environment variables
     const env = {
       ...process.env,
       PYTHONUNBUFFERED: '1',
+      PYTHONUTF8: '1',
+      PYTHONIOENCODING: 'utf-8',
       PATH: `${process.env.PATH};C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\\bin`
     };
 
     // Spawn Python process
+    log.info('Spawning Python process...');
     pythonProcess = spawn(pythonPath, [webuiScript], {
       env,
       cwd: appPath,
@@ -142,20 +169,27 @@ function startPythonBackend() {
 
     pythonProcess.on('error', (error) => {
       log.error(`Failed to start Python: ${error.message}`);
+      log.error(`Error code: ${error.code}`);
+      log.error(`Error syscall: ${error.syscall}`);
       reject(error);
     });
 
-    pythonProcess.on('exit', (code) => {
-      log.info(`Python process exited with code: ${code}`);
+    pythonProcess.on('exit', (code, signal) => {
+      log.info(`Python process exited with code: ${code}, signal: ${signal}`);
       if (mainWindow) {
         mainWindow.webContents.send('python-exit', code);
+      }
+      if (!started) {
+        reject(new Error(`Python exited with code ${code} before starting WebUI`));
       }
     });
 
     // Timeout after 60 seconds
     setTimeout(() => {
       if (!started) {
-        reject(new Error('Python backend failed to start within 60 seconds'));
+        const errorMsg = 'Python backend failed to start within 60 seconds';
+        log.error(errorMsg);
+        reject(new Error(errorMsg));
       }
     }, 60000);
   });
